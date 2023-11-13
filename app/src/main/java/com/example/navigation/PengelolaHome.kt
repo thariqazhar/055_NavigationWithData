@@ -1,19 +1,18 @@
-@file:OptIn (ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.example.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons. Icons
-import androidx.compose.material.icons.filled. ArrowBack
-import androidx.compose.material3. ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3. IconButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3. Text
-import androidx.compose.material3. TopAppBar
-import androidx.compose.material3. TopAppBarDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,8 +30,10 @@ import com.example.navigation.data.SumberData.flavors
 enum class PengelolaHalaman {
     Home,
     Rasa,
-    Summary
+    Summary,
+    Formulir
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EsJumboAppBar(
@@ -41,8 +42,8 @@ fun EsJumboAppBar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text (stringResource (id = R.string.app_name)) },
-        colors = TopAppBarDefaults.mediumTopAppBarColors (
+        title = { Text(stringResource(id = R.string.app_name)) },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor =
             MaterialTheme.colorScheme.primaryContainer
         ),
@@ -65,7 +66,7 @@ fun EsJumboAppBar(
 fun EsJumboApp(
     viewModel: OrderViewModel = viewModel(),
     navController: NavController = rememberNavController()
-){
+) {
     Scaffold(
         topBar = {
             EsJumboAppBar(
@@ -74,7 +75,7 @@ fun EsJumboApp(
                 }
             )
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
         val uiState by viewModel.stateUI.collectAsState()
         NavHost(
             navController = navController as NavHostController,
@@ -82,30 +83,39 @@ fun EsJumboApp(
             modifier = Modifier.padding(innerPadding)
         )
         {
-            composable(route = PengelolaHalaman.Home.name){
-                HalamanHome (
-                    onNextButtonClicked = {
-                        navController.navigate(PengelolaHalaman.Rasa.name)})
+            composable(route = PengelolaHalaman.Home.name) {
+                HalamanHome(
+                    onNextButtonClicked = { navController.navigate(PengelolaHalaman.Formulir.name) })
             }
-            composable(route = PengelolaHalaman.Rasa.name){
+            composable(route = PengelolaHalaman.Formulir.name) {
+                HalamanForm(onSubmitButtonClick = {
+                    viewModel.setContact(it)
+                    navController.navigate(PengelolaHalaman.Rasa.name)
+                })
+            }
+            composable(route = PengelolaHalaman.Rasa.name) {
                 val context = LocalContext.current
                 HalamanSatu(
                     pilihanRasa = flavors.map { id ->
-                        context.resources.getString(id)},
-                    onSelectionChanged = {viewModel.setRasa(it)},
-                    onConfirmButtonClicked = {viewModel.setJumlah(it)},
-                    onNextButtonClicked = {navController.navigate(PengelolaHalaman.Summary.name)},
-                    onCancelButtonClicked = {cancelOrderAndNavigateToHome(
-                        viewModel,
-                        navController
-                    )
-                    })
+                        context.resources.getString(id)
+                    },
+                    onSelectionChanged = { viewModel.setRasa(it) },
+                    onConfirmButtonClicked = { viewModel.setJumlah(it) },
+                    onNextButtonClicked = { navController.navigate(PengelolaHalaman.Summary.name) },
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToHome(
+                            viewModel,
+                            navController
+                        )
+                    }
+                )
             }
             composable(route = PengelolaHalaman.Summary.name) {
                 HalamanDua(
                     orderUiState = uiState,
                     onCancelButtonCLicked = {
-                        cancelOrderAndNavigateToRasa(navController) },
+                        cancelOrderAndNavigateToRasa(navController)
+                    },
                     //onSendButtonClicked = { subject: String, Summary: String -> }
                 )
             }
@@ -114,14 +124,15 @@ fun EsJumboApp(
 }
 
 
-private fun cancelOrderAndNavigateToHome (
+private fun cancelOrderAndNavigateToHome(
     viewModel: OrderViewModel,
     navController: NavController
-){
+) {
     viewModel.resetOrder()
-    navController.popBackStack (PengelolaHalaman.Home.name, inclusive = false)
+    navController.popBackStack(PengelolaHalaman.Home.name, inclusive = false)
 }
-private fun cancelOrderAndNavigateToRasa (
+
+private fun cancelOrderAndNavigateToRasa(
     navController: NavController
 ) {
     navController.popBackStack(PengelolaHalaman.Rasa.name, inclusive = false)
