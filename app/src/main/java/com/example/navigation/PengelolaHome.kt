@@ -31,8 +31,7 @@ import com.example.navigation.data.SumberData.flavors
 enum class PengelolaHalaman {
     Home,
     Rasa,
-    Summary,
-    Formulir
+    Summary
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,13 +84,8 @@ fun EsJumboApp(
         {
             composable(route = PengelolaHalaman.Home.name){
                 HalamanHome (
-                    onNextButtonClicked = {navController.navigate(PengelolaHalaman.Formulir.name)})
-        }
-        composable(route = PengelolaHalaman.Formulir.name){
-            HalamanForm(onSubmitButtonClick = {
-                viewModel.setContact(it)
-                navController.navigate(PengelolaHalaman.Rasa.name)
-            })
+                    onNextButtonClicked = {
+                        navController.navigate(PengelolaHalaman.Rasa.name)})
             }
             composable(route = PengelolaHalaman.Rasa.name){
                 val context = LocalContext.current
